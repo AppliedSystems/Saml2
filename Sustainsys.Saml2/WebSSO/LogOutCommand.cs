@@ -156,16 +156,30 @@ namespace Sustainsys.Saml2.WebSso
                 throw new ArgumentNullException(nameof(options));
             }
 
-            string idpEntityId = null;
             Claim sessionIndexClaim = null;
+            IdentityProvider idp = null;
             if (request.User != null)
             {
-                idpEntityId = request.User.FindFirst(Saml2ClaimTypes.LogoutNameIdentifier)?.Issuer;
+                //Get the first idp amongst possibly multiple idp's
+                var idps = new System.Collections.Generic.List<IdentityProvider>();
+                var logoutIds = request.User.FindAll(Saml2ClaimTypes.LogoutNameIdentifier);
+                foreach( var logoutId in logoutIds )
+                {
+                    var found = options.IdentityProviders.TryGetValue
+                        (new EntityId(logoutId.Issuer), out IdentityProvider _idp);
+
+                    if (found)
+                    {
+                        idps.Add(_idp);
+                    }
+                }
+                idp = idps.Count > 0 ? idps.First() : null;
+
                 sessionIndexClaim = request.User.FindFirst(Saml2ClaimTypes.SessionIndex);
             }
 
-            IdentityProvider idp;
-            var knownIdp = options.IdentityProviders.TryGetValue(new EntityId(idpEntityId), out idp);
+            var knownIdp = idp != null;
+            var idpEntityId = idp?.EntityId.Id;
 
             options.SPOptions.Logger.WriteVerbose("Initiating logout, checking requirements for federated logout"
                 + "\n  Issuer of LogoutNameIdentifier claim (should be Idp entity id): " + idpEntityId
