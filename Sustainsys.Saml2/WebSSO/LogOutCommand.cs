@@ -200,7 +200,7 @@ namespace Sustainsys.Saml2.WebSso
                 var logoutRequest = idp.CreateLogoutRequest(request.User);
 
                 commandResult = Saml2Binding.Get(idp.SingleLogoutServiceBinding)
-                    .Bind(logoutRequest);
+                    .Bind(logoutRequest, options.SPOptions.Logger);
 
                 commandResult.RelayState = logoutRequest.RelayState;
                 commandResult.RequestState = new StoredRequestState(
@@ -287,7 +287,7 @@ namespace Sustainsys.Saml2.WebSso
             options.SPOptions.Logger.WriteInformation("Got a logout request " + request.Id
                 + ", responding with logout response " + response.Id);
 
-            var result = Saml2Binding.Get(idp.SingleLogoutServiceBinding).Bind(response);
+            var result = Saml2Binding.Get(idp.SingleLogoutServiceBinding).Bind(response, options.SPOptions.Logger);
             result.TerminateLocalSession = true;
             return result;
         }
