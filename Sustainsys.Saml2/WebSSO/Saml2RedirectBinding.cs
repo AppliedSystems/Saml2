@@ -26,7 +26,6 @@ namespace Sustainsys.Saml2.WebSso
             }
 
             var messageXml = message.ToXml();
-            logger?.WriteVerbose("Sending message over Http Redirect Binding\n" + messageXml);
 
             var serializedRequest = Serialize(messageXml);
 
@@ -42,6 +41,8 @@ namespace Sustainsys.Saml2.WebSso
             var redirectUri = new Uri(message.DestinationUrl.ToString()
                 + (string.IsNullOrEmpty(message.DestinationUrl.Query) ? "?" : "&")
                 + queryString);
+
+            logger?.WriteVerbose("Sending message over Http Redirect Binding\n" + messageXml + "\nUrl: " + redirectUri);
 
             return new CommandResult()
             {
@@ -99,7 +100,7 @@ namespace Sustainsys.Saml2.WebSso
                     }
                 }
             }
-            catch(FormatException ex)
+            catch (FormatException ex)
             {
                 throw new FormatException($"\'{encodedPayload}\' is not a valid Base64 encoded string: {ex.Message}", ex);
             }

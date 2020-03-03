@@ -336,7 +336,7 @@ namespace Sustainsys.Saml2
         /// <returns>CommandResult with the bound request.</returns>
         public CommandResult Bind(ISaml2Message request)
         {
-            return Saml2Binding.Get(Binding).Bind(request);
+            return Saml2Binding.Get(Binding).Bind(request, spOptions?.Logger);
         }
 
         private ConfiguredAndLoadedSigningKeysCollection signingKeys =
@@ -433,11 +433,11 @@ namespace Sustainsys.Saml2
 
             foreach (var kv in idpDescriptor.ArtifactResolutionServices)
             {
-				var ars = kv.Value;
+                var ars = kv.Value;
                 artifactResolutionServiceUrls[ars.Index] = ars.Location;
             }
 
-			var arsKeys = idpDescriptor.ArtifactResolutionServices.ToLookup(x => x.Value.Index);
+            var arsKeys = idpDescriptor.ArtifactResolutionServices.ToLookup(x => x.Value.Index);
             foreach (var ars in artifactResolutionServiceUrls.Keys
                 .Where(k => !arsKeys.Contains(k)))
             {
@@ -447,7 +447,7 @@ namespace Sustainsys.Saml2
             var keys = idpDescriptor.Keys.Where(k => k.Use == KeyType.Unspecified || k.Use == KeyType.Signing);
 
             signingKeys.SetLoadedItems(keys.Select(k => k.KeyInfo
-				.MakeSecurityKeyIdentifier().First(c => c.CanCreateKey)).ToList());
+                .MakeSecurityKeyIdentifier().First(c => c.CanCreateKey)).ToList());
         }
 
         private static T GetPreferredEndpoint<T>(ICollection<T> endpoints) where T : Endpoint
@@ -498,7 +498,7 @@ namespace Sustainsys.Saml2
         private static void DoLoadMetadataIfTargetAlive(WeakReference<IdentityProvider> target)
         {
             IdentityProvider idp;
-            if(target.TryGetTarget(out idp))
+            if (target.TryGetTarget(out idp))
             {
                 idp.DoLoadMetadata();
             }

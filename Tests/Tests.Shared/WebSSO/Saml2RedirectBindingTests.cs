@@ -54,83 +54,83 @@ namespace Sustainsys.Saml2.Tests.WebSso
                 + "    Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\"/>\r\n"
                 + "</samlp:AuthnRequest>\r\n";
 
-		private const string ExampleSerializedData = "fZFfa8IwFMXfBb9DyXvaJtZ1BqsURRC2Mabbw95ivc5Am3TJrXPffmmLY3%2FA15Pzuyf33On8XJXBCaxTRmeEhTEJQBdmr%2FRbRp63K3pL5rPhYOpkVdYib%2FCon%2BC9AYfDQRB4WDvRvWWksVoY6ZQTWlbgBBZik9%2FfCR7GorYGTWFK8pu6DknnwKL%2FWEetlxmR8sBHbHJDWZqOKGdsRJM0kfQAjCUJ43KX8s78ctnIz%2Blp5xpYa4dSo1fjOKGM03i8jSeCMzGevHa2%2FBK5MNo1FdgN2JMqPLmHc0b6WTmiVbsGoTf5qv66Zq2t60x0wXZ2RKydiCJXh3CWVV1CWJgqanfl0%2Bin8xutxYOvZL18NKUqPlvZR5el%2BVhYkAgZQdsA6fWVsZXE63W2itrTQ2cVaKV2CjSSqL1v9P%2FAXv4C";
+        private const string ExampleSerializedData = "fZFfa8IwFMXfBb9DyXvaJtZ1BqsURRC2Mabbw95ivc5Am3TJrXPffmmLY3%2FA15Pzuyf33On8XJXBCaxTRmeEhTEJQBdmr%2FRbRp63K3pL5rPhYOpkVdYib%2FCon%2BC9AYfDQRB4WDvRvWWksVoY6ZQTWlbgBBZik9%2FfCR7GorYGTWFK8pu6DknnwKL%2FWEetlxmR8sBHbHJDWZqOKGdsRJM0kfQAjCUJ43KX8s78ctnIz%2Blp5xpYa4dSo1fjOKGM03i8jSeCMzGevHa2%2FBK5MNo1FdgN2JMqPLmHc0b6WTmiVbsGoTf5qv66Zq2t60x0wXZ2RKydiCJXh3CWVV1CWJgqanfl0%2Bin8xutxYOvZL18NKUqPlvZR5el%2BVhYkAgZQdsA6fWVsZXE63W2itrTQ2cVaKV2CjSSqL1v9P%2FAXv4C";
 
-		private static string DeflateBase64EncodedData(string input)
-		{
-			byte[] data = Convert.FromBase64String(input);
-			using (MemoryStream ms = new MemoryStream(data, false))
-			using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress))
-			using (StreamReader sr = new StreamReader(ds))
-			{
-				return sr.ReadToEnd();
-			}
-		}
+        private static string DeflateBase64EncodedData(string input)
+        {
+            byte[] data = Convert.FromBase64String(input);
+            using (MemoryStream ms = new MemoryStream(data, false))
+            using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress))
+            using (StreamReader sr = new StreamReader(ds))
+            {
+                return sr.ReadToEnd();
+            }
+        }
 
-		private static void CompareCommandResults(CommandResult result, CommandResult expected)
-		{
-			result.HttpStatusCode.Should().Be(expected.HttpStatusCode);
-			result.Cacheability.Should().Be(expected.Cacheability);
-			result.Principal.Should().Be(expected.Principal);
-			result.SessionNotOnOrAfter.Should().Be(expected.SessionNotOnOrAfter);
-			result.Content.Should().Be(expected.Content);
-			result.ContentType.Should().Be(expected.ContentType);
-			result.RelayData.Should().BeEquivalentTo(expected.RelayData);
-			result.TerminateLocalSession.Should().Be(expected.TerminateLocalSession);
-			result.SetCookieName.Should().Be(expected.SetCookieName);
-			result.RelayState.Should().Be(expected.RelayState);
-			result.RequestState.Should().Be(expected.RequestState);
-			result.ClearCookieName.Should().Be(expected.ClearCookieName);
-			result.HandledResult.Should().Be(expected.HandledResult);
+        private static void CompareCommandResults(CommandResult result, CommandResult expected)
+        {
+            result.HttpStatusCode.Should().Be(expected.HttpStatusCode);
+            result.Cacheability.Should().Be(expected.Cacheability);
+            result.Principal.Should().Be(expected.Principal);
+            result.SessionNotOnOrAfter.Should().Be(expected.SessionNotOnOrAfter);
+            result.Content.Should().Be(expected.Content);
+            result.ContentType.Should().Be(expected.ContentType);
+            result.RelayData.Should().BeEquivalentTo(expected.RelayData);
+            result.TerminateLocalSession.Should().Be(expected.TerminateLocalSession);
+            result.SetCookieName.Should().Be(expected.SetCookieName);
+            result.RelayState.Should().Be(expected.RelayState);
+            result.RequestState.Should().Be(expected.RequestState);
+            result.ClearCookieName.Should().Be(expected.ClearCookieName);
+            result.HandledResult.Should().Be(expected.HandledResult);
 
-			if (result.Location == null)
-			{
-				if (expected.Location != null)
-				{
-					throw new Exception(
-						$"Expected member Location to be {expected.Location} but found null");
-				}
-			}
-			else
-			{
-				if (expected.Location == null)
-				{
-					throw new Exception(
-						$"Expected member Location to be null but found but found {result.Location}");
-				}
+            if (result.Location == null)
+            {
+                if (expected.Location != null)
+                {
+                    throw new Exception(
+                        $"Expected member Location to be {expected.Location} but found null");
+                }
+            }
+            else
+            {
+                if (expected.Location == null)
+                {
+                    throw new Exception(
+                        $"Expected member Location to be null but found but found {result.Location}");
+                }
 
-				var components = UriComponents.Scheme | UriComponents.Host | UriComponents.Port 
-					| UriComponents.Path;
-				result.Location.GetComponents(components, UriFormat.UriEscaped).Should().Be(
-					expected.Location.GetComponents(components, UriFormat.UriEscaped));
+                var components = UriComponents.Scheme | UriComponents.Host | UriComponents.Port
+                    | UriComponents.Path;
+                result.Location.GetComponents(components, UriFormat.UriEscaped).Should().Be(
+                    expected.Location.GetComponents(components, UriFormat.UriEscaped));
 
-				var resultQuery = HttpUtility.ParseQueryString(result.Location.Query);
-				var expectedQuery = HttpUtility.ParseQueryString(expected.Location.Query);
-				resultQuery.Keys.Should().BeEquivalentTo(expectedQuery.Keys);
+                var resultQuery = HttpUtility.ParseQueryString(result.Location.Query);
+                var expectedQuery = HttpUtility.ParseQueryString(expected.Location.Query);
+                resultQuery.Keys.Should().BeEquivalentTo(expectedQuery.Keys);
 
-				foreach (string key in resultQuery)
-				{
-					var resultValues = resultQuery.GetValues(key);
-					var expectedValues = expectedQuery.GetValues(key);
-					resultValues.Length.Should().Be(expectedValues.Length);
+                foreach (string key in resultQuery)
+                {
+                    var resultValues = resultQuery.GetValues(key);
+                    var expectedValues = expectedQuery.GetValues(key);
+                    resultValues.Length.Should().Be(expectedValues.Length);
 
-					for (int i = 0; i < resultValues.Length; ++i)
-					{
-						var resultValue = resultValues[0];
-						var expectedValue = expectedValues[0];
+                    for (int i = 0; i < resultValues.Length; ++i)
+                    {
+                        var resultValue = resultValues[0];
+                        var expectedValue = expectedValues[0];
 
-						if (key == "SAMLRequest")
-						{
-							resultValue = DeflateBase64EncodedData(resultValue);
-							expectedValue = DeflateBase64EncodedData(expectedValue);
-						}
-						resultValue.Should().Be(expectedValue);
-					}
-				}
-			}
-		}
+                        if (key == "SAMLRequest")
+                        {
+                            resultValue = DeflateBase64EncodedData(resultValue);
+                            expectedValue = DeflateBase64EncodedData(expectedValue);
+                        }
+                        resultValue.Should().Be(expectedValue);
+                    }
+                }
+            }
+        }
 
-		[TestMethod]
+        [TestMethod]
         public void Saml2RedirectBinding_Bind()
         {
             var message = new Saml2MessageImplementation
@@ -142,13 +142,13 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             var result = Saml2Binding.Get(Saml2BindingType.HttpRedirect).Bind(message);
 
-			var expected = new CommandResult()
-			{
-				Location = new Uri("http://www.example.com/sso?SAMLRequest=" + ExampleSerializedData),
-				HttpStatusCode = System.Net.HttpStatusCode.SeeOther,
-			};
+            var expected = new CommandResult()
+            {
+                Location = new Uri("http://www.example.com/sso?SAMLRequest=" + ExampleSerializedData),
+                HttpStatusCode = System.Net.HttpStatusCode.SeeOther,
+            };
 
-			CompareCommandResults(result, expected);
+            CompareCommandResults(result, expected);
         }
 
         [TestMethod]
@@ -171,7 +171,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
         {
             var relayState = "BD823LGD";
 
-            var request = new HttpRequestData("GET", new Uri("http://localhost?SAMLRequest=" 
+            var request = new HttpRequestData("GET", new Uri("http://localhost?SAMLRequest="
                 + ExampleSerializedData + "&RelayState=" + relayState));
 
             var result = Saml2Binding.Get(Saml2BindingType.HttpRedirect).Unbind(request, null);
@@ -194,12 +194,12 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             var expected = new CommandResult()
             {
-                Location = new Uri("http://www.example.com/acs?aQueryParam=QueryParamValue&SAMLRequest=" 
+                Location = new Uri("http://www.example.com/acs?aQueryParam=QueryParamValue&SAMLRequest="
                     + ExampleSerializedData),
                 HttpStatusCode = System.Net.HttpStatusCode.SeeOther,
             };
 
-			CompareCommandResults(result, expected);
+            CompareCommandResults(result, expected);
         }
 
         [TestMethod]
@@ -222,7 +222,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             var result = Saml2Binding.Get(Saml2BindingType.HttpRedirect).Bind(message);
 
-			CompareCommandResults(result, expected);
+            CompareCommandResults(result, expected);
         }
 
         [TestMethod]
@@ -237,7 +237,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             var sigalg = queryParams["SigAlg"];
             var signatureDescription = (SignatureDescription)CryptographyExtensions
-				.CreateAlgorithmFromName(sigalg);
+                .CreateAlgorithmFromName(sigalg);
 
             var hashAlg = signatureDescription.CreateDigest();
             hashAlg.ComputeHash(Encoding.UTF8.GetBytes(signedData));
@@ -255,7 +255,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
             bool includeRelayState = true
             )
         {
-			var message = new Saml2MessageImplementation
+            var message = new Saml2MessageImplementation
             {
                 XmlData = "<Data/>",
                 RelayState = includeRelayState ? "SomeState that needs escaping #%=3" : null,
@@ -265,7 +265,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
                 SigningAlgorithm = SecurityAlgorithms.RsaSha256Signature
             };
 
-            if(!string.IsNullOrEmpty(issuer))
+            if (!string.IsNullOrEmpty(issuer))
             {
                 message.XmlData = $"<Data><Issuer xmlns=\"{Saml2Namespaces.Saml2Name}\">{issuer}</Issuer></Data>";
             }
@@ -308,7 +308,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             actual.TrustLevel.Should().Be(TrustLevel.Signature);
         }
-        
+
         [TestMethod]
         public void Saml2RedirectBinding_Unbind_HandlesValidSignature_WithoutRelayState()
         {
@@ -425,7 +425,7 @@ namespace Sustainsys.Saml2.Tests.WebSso
 
             Saml2Binding.Get(Saml2BindingType.HttpRedirect).Bind(message, logger);
 
-            logger.Received().WriteVerbose("Sending message over Http Redirect Binding\n<xml/>");
+            logger.Received().WriteVerbose(Arg.Is<string>(x => x.StartsWith("Sending message over Http Redirect Binding\n<xml/>\nUrl: http://destination/?=")));
         }
     }
 }
