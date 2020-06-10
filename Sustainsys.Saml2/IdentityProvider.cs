@@ -354,7 +354,7 @@ namespace Sustainsys.Saml2
             }
         }
 
-        object metadataLoadLock = new object();
+        object metadataLoadLock = new object();        
 
         private void DoLoadMetadata()
         {
@@ -497,10 +497,12 @@ namespace Sustainsys.Saml2
         [ExcludeFromCodeCoverage]
         private static void DoLoadMetadataIfTargetAlive(WeakReference<IdentityProvider> target)
         {
-            IdentityProvider idp;
+            IdentityProvider idp;          
             if (target.TryGetTarget(out idp))
             {
-                idp.DoLoadMetadata();
+                //If both MetadataLocation property and LoadMetaData is set, the job will be scheduled twice.
+                //We will add an additional check to reload the meta data only if required.
+                idp.ReloadMetadataIfRequired();
             }
         }
 
@@ -515,7 +517,10 @@ namespace Sustainsys.Saml2
             {
                 lock (metadataLoadLock)
                 {
-                    DoLoadMetadata();
+                    if (MetadataValidUntil.Value < DateTime.UtcNow) //Check again to make sure another thread did not load it
+                    {
+                        DoLoadMetadata();
+                    }
                 }
             }
         }
